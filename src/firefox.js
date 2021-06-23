@@ -1,8 +1,6 @@
-const { EventEmitter } = require('events')
-const HDKey = require('hdkey')
-const ethUtil = require('ethereumjs-util')
-// const sigUtil = require('eth-sig-util')
-// const { TransactionFactory } = require('@ethereumjs/tx')
+import { EventEmitter } from 'events'
+import HDKey from 'hdkey'
+import ethUtil from 'ethereumjs-util'
 
 const pathBase = 'm'
 const hdPathString = `${pathBase}/44'/60'/0'`
@@ -18,7 +16,7 @@ const NETWORK_API_URLS = {
   mainnet: 'https://api.etherscan.io',
 }
 
-class LedgerBridgeKeyring extends EventEmitter {
+class FirefoxLedgerBridge extends EventEmitter {
   constructor (opts = {}) {
     super()
     this.accountDetails = {}
@@ -115,30 +113,8 @@ class LedgerBridgeKeyring extends EventEmitter {
     return this.__getPage(-1)
   }
 
-  updateTransportMethod (useLedgerLive = false) {
-    return new Promise((resolve, reject) => {
-      // If the iframe isn't loaded yet, let's store the desired useLedgerLive value and
-      // optimistically return a successful promise
-      if (!this.iframeLoaded) {
-        this.delayedPromise = {
-          resolve,
-          reject,
-          useLedgerLive,
-        }
-        return
-      }
-
-      this._sendMessage({
-        action: 'ledger-update-transport',
-        params: { useLedgerLive },
-      }, ({ success }) => {
-        if (success) {
-          resolve(true)
-        } else {
-          reject(new Error('Ledger transport could not be updated'))
-        }
-      })
-    })
+  updateTransportMethod () {
+    console.log('Only for compatible')
   }
 
   signTransaction (address, tx, accountIndex) {
@@ -193,23 +169,6 @@ class LedgerBridgeKeyring extends EventEmitter {
   _setupIframe () {
     this.iframe = document.createElement('iframe')
     this.iframe.src = this.bridgeUrl
-    this.iframe.onload = async () => {
-      // If the ledger live preference was set before the iframe is loaded,
-      // set it after the iframe has loaded
-      this.iframeLoaded = true
-      if (this.delayedPromise) {
-        try {
-          const result = await this.updateTransportMethod(
-            this.delayedPromise.useLedgerLive,
-          )
-          this.delayedPromise.resolve(result)
-        } catch (e) {
-          this.delayedPromise.reject(e)
-        } finally {
-          delete this.delayedPromise
-        }
-      }
-    }
     document.head.appendChild(this.iframe)
   }
 
@@ -376,5 +335,5 @@ class LedgerBridgeKeyring extends EventEmitter {
 
 }
 
-LedgerBridgeKeyring.type = type
-module.exports = LedgerBridgeKeyring
+FirefoxLedgerBridge.type = type
+export default FirefoxLedgerBridge

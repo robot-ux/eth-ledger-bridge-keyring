@@ -11,7 +11,7 @@ const { TransactionFactory } = require('@ethereumjs/tx')
 const Common = require('@ethereumjs/common').default
 const sigUtil = require('eth-sig-util')
 
-const LedgerBridgeKeyring = require('..')
+const LedgerBridgeKeyring = require('../src')
 
 const { expect } = chai
 
